@@ -78,33 +78,6 @@ CREATE TABLE RESPONSABLE(
                 ON DELETE CASCADE
 );
 
-/* TABLA PEDIDOS
-   Pedidos realizados en la empresa. Si el cliente no es miembro, tomará valor nulo.
-
-   - ID Pedido (clave primaria)
-   - ID cliente (clave ajena) id int NULL,
-   - Fecha de pedido
-*/
-CREATE TABLE PEDIDOS(
-);
-
-/* TABLA PRODUCTOS
-   Productos disponibles en el vivero.ID cliente (clave ajena)
-   - Precio
-   - Peso
-*/
-CREATE TABLE PRODUCTOS(
-);
-
-/* TABLA PRODUCTOS-PEDIDOS
-   Relaciona un pedido con los productos comprados en el mismo.
-
-   - ID Pedido (clave primaria)
-   - ID Producto (clave primaria)
-*/
-CREATE TABLE PROD_PED(
-);
-
 /* TABLA CLIENTE
    Cliente de la empresa y miembro de Tajinaste Plus.
 
@@ -116,4 +89,51 @@ CREATE TABLE PROD_PED(
    - Bonificaciones
 */
 CREATE TABLE CLIENTE(
+   ID_CLIENTE INT NOT NULL,
+   NOMBRE VARCHAR(15),
+   APELLIDO VARCHAR(15),
+   N_COMPRAS INT NOT NULL DEFAULT 0,
+   N_PEDIDOS INT NOT NULL DEFAULT 0,
+   BONIFICACIONES AS N_COMPRAS * 0.1,
+   PRIMARY KEY(ID_CLIENTE)
+);
+
+/* TABLA PEDIDOS
+   Pedidos realizados en la empresa. Si el cliente no es miembro, tomará valor nulo.
+
+   - ID Pedido (clave primaria)
+   - ID cliente (clave ajena) id int NULL,
+   - Fecha de pedido
+*/
+CREATE TABLE PEDIDOS(
+   ID_PEDIDO INT NOT NULL,
+   ID_CLIENTE INT NULL,
+   FECHA DATE NOT NULL,
+   PRIMARY KEY (ID_PEDIDO),
+   CHECK (FECHA > '12-02-2000')
+);
+
+/* TABLA PRODUCTOS
+   Productos disponibles en el vivero.ID cliente (clave ajena)
+   
+   - ID Producto (clave primaria)
+   - Precio
+   - Peso
+*/
+CREATE TABLE PRODUCTOS(
+   ID_PRODUCTO INT NOT NULL,
+   PRECIO INT NOT NULL DEFAULT 0,
+   PESO FLOAT NOT NULL DEFAULT 0
+   PRIMARY KEY (ID_PRODUCTO)
+);
+
+/* TABLA PRODUCTOS-PEDIDOS
+   Relaciona un pedido con los productos comprados en el mismo.
+
+   - ID Pedido (clave primaria)
+   - ID Producto (clave primaria y ajena)
+*/
+CREATE TABLE PROD_PED(
+   ID_PEDIDO INT NOT NULL,
+   ID_PRODUCTO INT NOT NULL,
 );
