@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS customers;
 
    - ID Vivero (clave primaria)
    - Localización vivero
-   - Superficie
+   - Superficie en m^2
 */
 CREATE TABLE VIVERO(
     ID_VIVERO INT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE VIVERO(
    Zona dentro de un vivero determinado.
 
    - ID Zona (clave primaria)
-   - ID Vivero (clave ajena)
+   - ID Vivero (clave ajena y primaria)
    - Localización zona
    - Productividad
 */
@@ -32,7 +32,7 @@ CREATE TABLE ZONA(
     ID_VIVERO INT NOT NULL,
     LOCALIZACION VARCHAR(25),
     PRODUCTIVIDAD INT,
-    PRIMARY KEY(ID_ZONA)
+    PRIMARY KEY (ID_ZONA, ID_VIVERO),
     CONSTRAINT fk_idvivero
         FOREIGN KEY(ID_VIVERO)
             REFERENCES VIVERO(ID_VIVERO)
@@ -60,21 +60,22 @@ CREATE TABLE EMPLEADO(
 
    - DNI (clave ajena y primaria)
    - ID Zona (clave ajena y primaria)
+   - ID Vivero (clave ajena)
    - Época
 */
 CREATE TABLE RESPONSABLE(
     DNI VARCHAR(9) NOT NULL,
+    ID_VIVERO INT NOT NULL,
     ID_ZONA INT NOT NULL,
     EPOCA DATE NOT NULL,
-    PRIMARY KEY(DNI),
-    PRIMARY KEY(ID_ZONA),
+    PRIMARY KEY (DNI, ID_ZONA),
     CONSTRAINT fk_dni
-        FOREIGN KEY DNI
+        FOREIGN KEY (DNI)
             REFERENCES EMPLEADO(DNI)
                 ON DELETE CASCADE,
     CONSTRAINT fk_zona
-        FOREIGN KEY ZONA
-            REFERENCES ZONA(ID_ZONA)
+        FOREIGN KEY (ID_ZONA, ID_VIVERO)
+            REFERENCES ZONA(ID_ZONA, ID_VIVERO)
                 ON DELETE CASCADE
 );
 
@@ -94,7 +95,7 @@ CREATE TABLE CLIENTE(
    APELLIDO VARCHAR(15),
    N_COMPRAS INT NOT NULL DEFAULT 0,
    N_PEDIDOS INT NOT NULL DEFAULT 0,
-   BONIFICACIONES AS N_COMPRAS * 0.1,
+   BONIFICACIONES INT GENERATED ALWAYS AS (N_COMPRAS * 0.1) STORED,
    PRIMARY KEY(ID_CLIENTE)
 );
 
@@ -123,7 +124,7 @@ CREATE TABLE PEDIDOS(
 CREATE TABLE PRODUCTOS(
    ID_PRODUCTO INT NOT NULL,
    PRECIO INT NOT NULL DEFAULT 0,
-   PESO FLOAT NOT NULL DEFAULT 0
+   PESO FLOAT NOT NULL DEFAULT 0,
    PRIMARY KEY (ID_PRODUCTO)
 );
 
@@ -136,4 +137,9 @@ CREATE TABLE PRODUCTOS(
 CREATE TABLE PROD_PED(
    ID_PEDIDO INT NOT NULL,
    ID_PRODUCTO INT NOT NULL,
+   PRIMARY KEY (ID_PEDIDO, ID_PRODUCTO),
+   CONSTRAINT fk_producto
+        FOREIGN KEY (ID_PRODUCTO)
+            REFERENCES PRODUCTOS(ID_PRODUCTO)
+                ON DELETE CASCADE
 );
