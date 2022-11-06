@@ -68,12 +68,12 @@ CREATE TABLE RESPONSABLE(
     ID_VIVERO INT NOT NULL,
     ID_ZONA INT NOT NULL,
     EPOCA DATE NOT NULL,
-    PRIMARY KEY (DNI, ID_ZONA),
+    PRIMARY KEY (DNI, ID_ZONA, ID_VIVERO),
     CONSTRAINT fk_dni
         FOREIGN KEY (DNI)
             REFERENCES EMPLEADO(DNI)
                 ON DELETE CASCADE,
-    CONSTRAINT fk_zona
+    CONSTRAINT fk_zona_vivero
         FOREIGN KEY (ID_ZONA, ID_VIVERO)
             REFERENCES ZONA(ID_ZONA, ID_VIVERO)
                 ON DELETE CASCADE
@@ -103,7 +103,7 @@ CREATE TABLE CLIENTE(
    Pedidos realizados en la empresa. Si el cliente no es miembro, tomará valor nulo.
 
    - ID Pedido (clave primaria)
-   - ID cliente (clave ajena) id int NULL,
+   - ID cliente (clave ajena),
    - Fecha de pedido
 */
 CREATE TABLE PEDIDOS(
@@ -123,7 +123,7 @@ CREATE TABLE PEDIDOS(
 */
 CREATE TABLE PRODUCTOS(
    ID_PRODUCTO INT NOT NULL,
-   PRECIO INT NOT NULL DEFAULT 0,
+   PRECIO FLOAT NOT NULL DEFAULT 0,
    PESO FLOAT NOT NULL DEFAULT 0,
    PRIMARY KEY (ID_PRODUCTO)
 );
@@ -133,13 +133,38 @@ CREATE TABLE PRODUCTOS(
 
    - ID Pedido (clave primaria)
    - ID Producto (clave primaria y ajena)
+   - Cantidad
 */
 CREATE TABLE PROD_PED(
    ID_PEDIDO INT NOT NULL,
    ID_PRODUCTO INT NOT NULL,
+   CANTIDAD INT NOT NULL DEFAULT 1,
    PRIMARY KEY (ID_PEDIDO, ID_PRODUCTO),
    CONSTRAINT fk_producto
         FOREIGN KEY (ID_PRODUCTO)
+            REFERENCES PRODUCTOS(ID_PRODUCTO)
+                ON DELETE CASCADE
+);
+
+/* TABLA ZONA-PRODUCTOS
+   Productos almacenados en una zona determinada de un vivero determinado.
+
+   - ID Zona (clave ajena y primaria)
+   - ID Producto (clave ajena y primaria)
+   - Stock
+*/
+CREATE TABLE ZONA_PROD(
+    ID_ZONA INT NOT NULL,
+    ID_VIVERO INT NOT NULL,
+    ID_PRODUCTO INT NOT NULL,
+    STOCK INT,
+    PRIMARY KEY (ID_ZONA, ID_VIVERO, ID_PRODUCTO),
+    CONSTRAINT fk_zona
+        FOREIGN KEY(ID_ZONA, ID_VIVERO)
+            REFERENCES ZONA(ID_ZONA, ID_VIVERO)
+                ON DELETE CASCADE,
+    CONSTRAINT fk_producto
+        FOREIGN KEY(ID_PRODUCTO)
             REFERENCES PRODUCTOS(ID_PRODUCTO)
                 ON DELETE CASCADE
 );
